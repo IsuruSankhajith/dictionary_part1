@@ -1,0 +1,147 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
+using namespace std;
+// Define the Term struct.
+struct Word {
+    string name;
+    string definition;
+    string type;
+};
+
+// Function to load the dictionary from a file
+void loadDictionary(vector<Word>& dictionary) {
+    string fileName;
+    cout << "Enter the name of the dictionary file here, or just type \"default\" for the default file: ";
+    cin >> fileName;
+
+    if (fileName == "default") {
+        fileName = "dictionary_2023S1.txt";
+    }
+
+    ifstream file(fileName);
+    if (!file.is_open()) {
+        cerr << "Error: Unable to open dictionary file \"" << fileName << "\"" << endl;
+        return;
+    }
+
+    while (!file.eof()) {
+        Word word;
+        getline(file, word.name, '\t');
+        getline(file, word.type, '\t');
+        getline(file, word.definition);
+
+        if (word.name.length() > 0) {
+            dictionary.push_back(word);
+        }
+    }
+
+    if (file.fail() && !file.eof()) {
+        cerr << "Error: Failed to read dictionary file \"" << fileName << "\"" << endl;
+        dictionary.clear();
+    } else {
+        cout << "Dictionary loaded!" << endl;
+    }
+
+    file.close();
+}
+
+
+// Function to display all words in the dictionary
+void displayAllWords(const vector<Word>& dictionary) {
+    if (dictionary.empty()) {
+        cout << "No dictionary loaded" << endl;
+        return;
+    }
+
+    //get words from dictionary and check z character count - newly added
+    for (const auto& word : dictionary) {
+
+        int count = 0;
+        for (int j = 0; j < word.name.size(); j++) {
+            if (word.name[j] == 'z') {
+                count++;
+            }
+        }
+        if (count > 3) {
+            cout << word.name << " (" << word.type << "): " << word.definition << endl;
+        }
+    }
+}
+
+// Function to search for a word in the dictionary
+void searchWord(const vector<Word>& dictionary) {
+    if (dictionary.empty()) {
+        cout << "No dictionary loaded" << endl;
+        return;
+    }
+
+    string searchName;
+    cout << "Enter the name of the word to search for: ";
+    cin >> searchName;
+
+    bool found = false;
+    for (const auto& word : dictionary) {
+        if (word.name == searchName) {
+            cout << word.name << " (" << word.type << "): " << word.definition << endl;
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        cout << "Word not found in the dictionary" << endl;
+    }
+}
+
+// Function to display the number of words in the dictionary
+void displayWordCount(const vector<Word>& dictionary) {
+    if (dictionary.empty()) {
+        cout << "No dictionary loaded" << endl;
+        return;
+    }
+
+    cout << "The dictionary contains " << dictionary.size() << " words" << endl;
+}
+
+// Main function
+int main() {
+    vector<Word> dictionary;
+
+    int choice;
+    do {
+        cout << "Menu:" << endl;
+        cout << "1. Load dictionary" << endl;
+        cout << "2. Display all words" << endl;
+        cout << "3. Search for a word" << endl;
+        cout << "4. Display word count" << endl;
+        cout << "5. Exit" << endl;
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                loadDictionary(dictionary);
+                break;
+            case 2:
+                displayAllWords(dictionary);
+                break;
+            case 3:
+                searchWord(dictionary);
+                break;
+            case 4:
+                displayWordCount(dictionary);
+                break;
+            case 5:
+                cout << "Exiting program..." << endl;
+                break;
+            default:
+                cout << "Invalid choice. Please try again." << endl;
+                break;
+        }
+    } while (choice != 5);
+
+    return 0;
+}
